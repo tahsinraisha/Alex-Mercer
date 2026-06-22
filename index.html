@@ -1,0 +1,1793 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Alex Mercer — Founder & Builder</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,700;0,800;1,700&display=swap" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --void: #06080D;
+      --surface: #0C0F1A;
+      --card: #111520;
+      --border: rgba(99,102,241,0.15);
+      --indigo: #6366F1;
+      --indigo-soft: #818CF8;
+      --indigo-glow: rgba(99,102,241,0.35);
+      --cyan: #22D3EE;
+      --white: #FFFFFF;
+      --muted: #64748B;
+      --text: #CBD5E1;
+      --radius: 16px;
+      --font: 'Inter', sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--font);
+      background: var(--void);
+      color: var(--white);
+      overflow-x: hidden;
+      cursor: none;
+    }
+
+    /* ── Custom Cursor ── */
+    .cursor {
+      position: fixed;
+      width: 12px; height: 12px;
+      background: var(--indigo);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9999;
+      transform: translate(-50%, -50%);
+      transition: transform 0.1s, width 0.3s, height 0.3s, opacity 0.3s;
+      mix-blend-mode: screen;
+    }
+    .cursor-ring {
+      position: fixed;
+      width: 40px; height: 40px;
+      border: 1.5px solid rgba(99,102,241,0.5);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9998;
+      transform: translate(-50%, -50%);
+      transition: transform 0.15s ease, width 0.3s, height 0.3s, border-color 0.3s;
+    }
+    body:hover .cursor { opacity: 1; }
+
+    /* ── Noise Texture ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.6;
+    }
+
+    /* ── Nav ── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      padding: 20px 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid transparent;
+      transition: background 0.4s, border-color 0.4s, padding 0.4s;
+    }
+    nav.scrolled {
+      background: rgba(6,8,13,0.85);
+      border-color: var(--border);
+      backdrop-filter: blur(20px);
+      padding: 14px 48px;
+    }
+    .nav-logo {
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      background: linear-gradient(135deg, #fff 40%, var(--indigo-soft));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .nav-links { display: flex; gap: 36px; list-style: none; }
+    .nav-links a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      letter-spacing: 0.02em;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--white); }
+    .nav-cta {
+      background: var(--indigo);
+      color: #fff;
+      border: none;
+      padding: 10px 22px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: none;
+      transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 0 0 0 var(--indigo-glow);
+    }
+    .nav-cta:hover {
+      background: var(--indigo-soft);
+      transform: translateY(-1px);
+      box-shadow: 0 0 24px var(--indigo-glow);
+    }
+
+    /* ── Section Layout ── */
+    section { position: relative; z-index: 1; }
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 48px; }
+
+    /* ── HERO ── */
+    #hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 120px 48px 80px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* 3D Grid Floor */
+    .hero-grid {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 60%;
+      background:
+        linear-gradient(rgba(99,102,241,0.07) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(99,102,241,0.07) 1px, transparent 1px);
+      background-size: 60px 60px;
+      transform: perspective(800px) rotateX(60deg);
+      transform-origin: bottom center;
+      mask-image: linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 100%);
+      pointer-events: none;
+    }
+
+    /* Ambient blobs */
+    .blob {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(100px);
+      pointer-events: none;
+    }
+    .blob-1 {
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, rgba(99,102,241,0.18) 0%, transparent 70%);
+      top: -100px; left: 50%;
+      transform: translateX(-50%);
+      animation: blob-drift 8s ease-in-out infinite alternate;
+    }
+    .blob-2 {
+      width: 400px; height: 400px;
+      background: radial-gradient(circle, rgba(34,211,238,0.1) 0%, transparent 70%);
+      bottom: 10%; right: -100px;
+      animation: blob-drift 10s ease-in-out infinite alternate-reverse;
+    }
+    .blob-3 {
+      width: 350px; height: 350px;
+      background: radial-gradient(circle, rgba(129,140,248,0.12) 0%, transparent 70%);
+      bottom: 20%; left: -80px;
+      animation: blob-drift 12s ease-in-out infinite alternate;
+    }
+    @keyframes blob-drift {
+      from { transform: translateY(0) scale(1); }
+      to   { transform: translateY(-30px) scale(1.05); }
+    }
+
+    /* 3D Orb */
+    .hero-orb-wrap {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 500px;
+      height: 500px;
+      pointer-events: none;
+      transition: transform 0.1s ease;
+    }
+    .hero-orb {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background: radial-gradient(ellipse at 35% 35%,
+        rgba(129,140,248,0.25) 0%,
+        rgba(99,102,241,0.1) 35%,
+        rgba(6,8,13,0) 65%
+      );
+      box-shadow:
+        inset -30px -30px 60px rgba(0,0,0,0.5),
+        inset 20px 20px 40px rgba(129,140,248,0.08),
+        0 0 120px rgba(99,102,241,0.12);
+      animation: orb-rotate 20s linear infinite;
+    }
+    .hero-orb::before {
+      content: '';
+      position: absolute;
+      inset: 2px;
+      border-radius: 50%;
+      border: 1px solid rgba(129,140,248,0.2);
+      background: radial-gradient(ellipse at 30% 25%,
+        rgba(255,255,255,0.06) 0%,
+        transparent 60%
+      );
+    }
+    .hero-orb::after {
+      content: '';
+      position: absolute;
+      top: 12%; left: 20%;
+      width: 30%; height: 15%;
+      background: rgba(255,255,255,0.07);
+      border-radius: 50%;
+      filter: blur(8px);
+      transform: rotate(-15deg);
+    }
+    @keyframes orb-rotate {
+      from { transform: rotate(0deg); }
+      to   { transform: rotate(360deg); }
+    }
+
+    /* Floating ring */
+    .hero-ring {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%) rotateX(70deg);
+      width: 520px; height: 520px;
+      border-radius: 50%;
+      border: 1px solid rgba(99,102,241,0.3);
+      box-shadow: 0 0 40px rgba(99,102,241,0.1), inset 0 0 40px rgba(99,102,241,0.05);
+      animation: ring-spin 25s linear infinite;
+    }
+    .hero-ring-2 {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%) rotateX(70deg) rotateZ(45deg);
+      width: 620px; height: 620px;
+      border-radius: 50%;
+      border: 1px solid rgba(34,211,238,0.15);
+      animation: ring-spin 35s linear infinite reverse;
+    }
+    @keyframes ring-spin {
+      from { transform: translate(-50%, -50%) rotateX(70deg) rotateZ(0deg); }
+      to   { transform: translate(-50%, -50%) rotateX(70deg) rotateZ(360deg); }
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      max-width: 800px;
+    }
+    .hero-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--indigo-soft);
+      margin-bottom: 28px;
+      padding: 6px 16px;
+      border: 1px solid rgba(99,102,241,0.3);
+      border-radius: 100px;
+      background: rgba(99,102,241,0.08);
+    }
+    .hero-eyebrow span {
+      width: 6px; height: 6px;
+      background: var(--indigo-soft);
+      border-radius: 50%;
+      display: inline-block;
+      box-shadow: 0 0 8px var(--indigo);
+      animation: pulse-dot 2s ease-in-out infinite;
+    }
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.7); }
+    }
+    .hero-title {
+      font-size: clamp(52px, 8vw, 88px);
+      font-weight: 800;
+      line-height: 1.05;
+      letter-spacing: -0.03em;
+      margin-bottom: 24px;
+    }
+    .hero-title .line { display: block; overflow: hidden; }
+    .hero-title .line span { display: block; }
+    .hero-title .accent {
+      background: linear-gradient(135deg, var(--indigo-soft) 0%, var(--cyan) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .hero-sub {
+      font-size: 20px;
+      line-height: 1.6;
+      color: var(--text);
+      max-width: 560px;
+      margin: 0 auto 48px;
+      font-weight: 400;
+    }
+    .hero-actions {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      align-items: center;
+    }
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--indigo);
+      color: #fff;
+      padding: 14px 28px;
+      border-radius: 10px;
+      font-size: 15px;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: none;
+      border: none;
+      transition: all 0.25s;
+      box-shadow: 0 4px 24px rgba(99,102,241,0.35), 0 0 0 0 rgba(99,102,241,0.4);
+      position: relative;
+      overflow: hidden;
+    }
+    .btn-primary::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 60%);
+      pointer-events: none;
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 40px rgba(99,102,241,0.5);
+    }
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: transparent;
+      color: var(--text);
+      padding: 14px 28px;
+      border-radius: 10px;
+      font-size: 15px;
+      font-weight: 500;
+      text-decoration: none;
+      cursor: none;
+      border: 1px solid rgba(255,255,255,0.1);
+      transition: all 0.25s;
+    }
+    .btn-secondary:hover {
+      border-color: rgba(255,255,255,0.25);
+      color: var(--white);
+      transform: translateY(-2px);
+    }
+    .hero-stats {
+      display: flex;
+      justify-content: center;
+      gap: 60px;
+      margin-top: 80px;
+      padding-top: 48px;
+      border-top: 1px solid rgba(255,255,255,0.06);
+    }
+    .stat-item { text-align: center; }
+    .stat-value {
+      font-size: 40px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      background: linear-gradient(135deg, #fff 0%, var(--indigo-soft) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .stat-label {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 4px;
+      font-weight: 500;
+    }
+
+    /* ── ABOUT ── */
+    #about {
+      padding: 120px 0;
+    }
+    .about-inner {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: center;
+    }
+    .about-visual {
+      position: relative;
+    }
+    .about-photo-frame {
+      position: relative;
+      border-radius: 24px;
+      overflow: hidden;
+      background: var(--card);
+      border: 1px solid var(--border);
+      aspect-ratio: 4/5;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    /* 3D card tilt effect */
+    .about-photo-frame::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg,
+        rgba(129,140,248,0.08) 0%,
+        transparent 50%,
+        rgba(34,211,238,0.04) 100%
+      );
+      z-index: 1;
+    }
+    .about-photo-placeholder {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      background: linear-gradient(135deg, #111520 0%, #0C0F1A 100%);
+    }
+    .avatar-circle {
+      width: 120px; height: 120px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--indigo) 0%, var(--cyan) 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 48px;
+      font-weight: 800;
+      color: white;
+      box-shadow: 0 0 60px rgba(99,102,241,0.4);
+    }
+    .about-photo-name {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--white);
+    }
+    .about-photo-role {
+      font-size: 14px;
+      color: var(--indigo-soft);
+      font-weight: 500;
+    }
+    .about-badge {
+      position: absolute;
+      bottom: 24px;
+      right: -20px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      z-index: 2;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+    }
+    .badge-icon {
+      width: 40px; height: 40px;
+      background: linear-gradient(135deg, var(--indigo), var(--cyan));
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+    }
+    .badge-text strong { display: block; font-size: 15px; font-weight: 700; }
+    .badge-text span { font-size: 12px; color: var(--muted); }
+
+    .section-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--indigo-soft);
+      margin-bottom: 20px;
+    }
+    .section-eyebrow::before {
+      content: '';
+      display: block;
+      width: 24px; height: 1px;
+      background: var(--indigo-soft);
+    }
+    .section-title {
+      font-size: clamp(36px, 4vw, 52px);
+      font-weight: 800;
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+      margin-bottom: 20px;
+    }
+    .section-title .accent {
+      background: linear-gradient(135deg, var(--indigo-soft), var(--cyan));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .section-body {
+      font-size: 17px;
+      line-height: 1.75;
+      color: var(--text);
+      margin-bottom: 16px;
+    }
+    .about-skills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 32px;
+    }
+    .skill-tag {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text);
+      background: rgba(99,102,241,0.1);
+      border: 1px solid rgba(99,102,241,0.2);
+      padding: 6px 14px;
+      border-radius: 6px;
+      transition: all 0.2s;
+    }
+    .skill-tag:hover {
+      background: rgba(99,102,241,0.2);
+      border-color: var(--indigo);
+      color: var(--white);
+    }
+
+    /* ── ACHIEVEMENTS ── */
+    #achievements {
+      padding: 120px 0;
+      background: linear-gradient(180deg, var(--void) 0%, var(--surface) 50%, var(--void) 100%);
+    }
+    .achievements-header {
+      text-align: center;
+      margin-bottom: 80px;
+    }
+    .achievements-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+    .achievement-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 36px 32px;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.3s, border-color 0.3s, box-shadow 0.3s;
+      transform-style: preserve-3d;
+    }
+    .achievement-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(99,102,241,0.5), transparent);
+    }
+    .achievement-card:hover {
+      transform: translateY(-6px) rotateX(2deg);
+      border-color: rgba(99,102,241,0.4);
+      box-shadow: 0 24px 60px rgba(0,0,0,0.4), 0 0 40px rgba(99,102,241,0.08);
+    }
+    .achievement-number {
+      font-size: 52px;
+      font-weight: 900;
+      letter-spacing: -0.04em;
+      background: linear-gradient(135deg, #fff 0%, var(--indigo-soft) 60%, var(--cyan) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+    .achievement-label {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--white);
+      margin-bottom: 10px;
+    }
+    .achievement-desc {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+    .achievement-icon {
+      position: absolute;
+      top: 32px; right: 32px;
+      font-size: 28px;
+      opacity: 0.6;
+    }
+    .achievement-glow {
+      position: absolute;
+      bottom: -40px; right: -40px;
+      width: 150px; height: 150px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(99,102,241,0.12) 0%, transparent 70%);
+    }
+
+    /* ── CASE STUDIES ── */
+    #casestudies {
+      padding: 120px 0;
+    }
+    .cs-header {
+      text-align: center;
+      margin-bottom: 80px;
+    }
+    .cs-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 24px;
+    }
+    .cs-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      overflow: hidden;
+      position: relative;
+      transition: transform 0.4s cubic-bezier(0.23, 1, 0.32, 1), box-shadow 0.4s;
+      cursor: none;
+    }
+    .cs-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 40px 80px rgba(0,0,0,0.5), 0 0 60px rgba(99,102,241,0.1);
+    }
+    .cs-card-thumb {
+      height: 220px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 56px;
+      position: relative;
+      overflow: hidden;
+    }
+    .cs-card-thumb::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 60px;
+      background: linear-gradient(to bottom, transparent, var(--card));
+    }
+    .cs-thumb-bg-1 { background: linear-gradient(135deg, #1a1040 0%, #0e0a2e 100%); }
+    .cs-thumb-bg-2 { background: linear-gradient(135deg, #051a24 0%, #071424 100%); }
+    .cs-thumb-bg-3 { background: linear-gradient(135deg, #1a0a24 0%, #0e0a1e 100%); }
+    .cs-thumb-bg-4 { background: linear-gradient(135deg, #0a1a10 0%, #081408 100%); }
+    .cs-card-body { padding: 28px 32px 36px; }
+    .cs-tag {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--indigo-soft);
+      background: rgba(99,102,241,0.1);
+      border-radius: 100px;
+      padding: 4px 12px;
+      margin-bottom: 14px;
+    }
+    .cs-title {
+      font-size: 22px;
+      font-weight: 700;
+      line-height: 1.3;
+      margin-bottom: 12px;
+    }
+    .cs-desc {
+      font-size: 15px;
+      color: var(--text);
+      line-height: 1.65;
+      margin-bottom: 24px;
+    }
+    .cs-metrics {
+      display: flex;
+      gap: 24px;
+      padding-top: 20px;
+      border-top: 1px solid rgba(255,255,255,0.06);
+    }
+    .cs-metric-val {
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      background: linear-gradient(135deg, #fff, var(--indigo-soft));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .cs-metric-key {
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 500;
+      margin-top: 2px;
+    }
+    .cs-arrow {
+      position: absolute;
+      top: 24px; right: 24px;
+      width: 36px; height: 36px;
+      background: rgba(99,102,241,0.15);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      transition: background 0.2s, transform 0.2s;
+    }
+    .cs-card:hover .cs-arrow {
+      background: var(--indigo);
+      transform: translate(2px, -2px);
+    }
+
+    /* ── TESTIMONIALS ── */
+    #testimonials {
+      padding: 120px 0;
+      background: linear-gradient(180deg, var(--void) 0%, var(--surface) 50%, var(--void) 100%);
+      overflow: hidden;
+    }
+    .testimonials-header {
+      text-align: center;
+      margin-bottom: 60px;
+    }
+
+    /* Marquee */
+    .marquee-wrap { overflow: hidden; position: relative; }
+    .marquee-wrap::before,
+    .marquee-wrap::after {
+      content: '';
+      position: absolute;
+      top: 0; bottom: 0;
+      width: 200px;
+      z-index: 2;
+      pointer-events: none;
+    }
+    .marquee-wrap::before { left: 0; background: linear-gradient(to right, var(--void), transparent); }
+    .marquee-wrap::after  { right: 0; background: linear-gradient(to left, var(--void), transparent); }
+    .marquee-track {
+      display: flex;
+      gap: 24px;
+      animation: marquee-scroll 40s linear infinite;
+      width: max-content;
+    }
+    .marquee-track-reverse {
+      animation-direction: reverse;
+      margin-top: 24px;
+    }
+    @keyframes marquee-scroll {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-50%); }
+    }
+    .marquee-wrap:hover .marquee-track { animation-play-state: paused; }
+
+    .t-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px 32px;
+      width: 360px;
+      flex-shrink: 0;
+      position: relative;
+      transition: border-color 0.3s, box-shadow 0.3s;
+    }
+    .t-card:hover {
+      border-color: rgba(99,102,241,0.35);
+      box-shadow: 0 0 40px rgba(99,102,241,0.08);
+    }
+    .t-quote {
+      font-size: 28px;
+      color: var(--indigo-soft);
+      margin-bottom: 12px;
+      line-height: 1;
+    }
+    .t-text {
+      font-size: 15px;
+      line-height: 1.7;
+      color: var(--text);
+      margin-bottom: 24px;
+    }
+    .t-author {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .t-avatar {
+      width: 40px; height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 14px;
+      color: white;
+      flex-shrink: 0;
+    }
+    .t-author-name { font-size: 14px; font-weight: 600; }
+    .t-author-title { font-size: 12px; color: var(--muted); margin-top: 2px; }
+    .t-stars { color: #FBBF24; font-size: 12px; margin-bottom: 12px; letter-spacing: 2px; }
+        /* ── CONTACT ── */
+    #contact {
+      padding: 120px 0 160px;
+    }
+    .contact-inner {
+      max-width: 680px;
+      margin: 0 auto;
+      text-align: center;
+    }
+    .contact-title {
+      font-size: clamp(40px, 5vw, 60px);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+      margin-bottom: 20px;
+    }
+    .contact-sub {
+      font-size: 18px;
+      color: var(--text);
+      line-height: 1.65;
+      margin-bottom: 48px;
+    }
+    .contact-form {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      text-align: left;
+    }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .form-group { display: flex; flex-direction: column; gap: 8px; }
+    .form-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      letter-spacing: 0.02em;
+    }
+    .form-input, .form-textarea, .form-select {
+      background: var(--card);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 10px;
+      padding: 14px 16px;
+      font-size: 15px;
+      color: var(--white);
+      font-family: var(--font);
+      transition: border-color 0.2s, box-shadow 0.2s;
+      outline: none;
+      width: 100%;
+    }
+    .form-input::placeholder,
+    .form-textarea::placeholder { color: var(--muted); }
+    .form-input:focus,
+    .form-textarea:focus,
+    .form-select:focus {
+      border-color: var(--indigo);
+      box-shadow: 0 0 0 3px rgba(99,102,241,0.15);
+    }
+    .form-textarea {
+      resize: vertical;
+      min-height: 140px;
+    }
+    .form-select { cursor: none; }
+    .form-select option { background: #111520; }
+    .form-submit {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      background: var(--indigo);
+      color: #fff;
+      padding: 16px 32px;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: none;
+      border: none;
+      font-family: var(--font);
+      transition: all 0.25s;
+      box-shadow: 0 4px 24px rgba(99,102,241,0.35);
+      width: 100%;
+      position: relative;
+      overflow: hidden;
+    }
+    .form-submit::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 60%);
+    }
+    .form-submit:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 40px rgba(99,102,241,0.5);
+      background: var(--indigo-soft);
+    }
+       /* Social links */
+    .contact-socials {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      margin-top: 40px;
+    }
+    .social-link {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      padding: 10px 20px;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 8px;
+      transition: all 0.2s;
+      cursor: none;
+    }
+    .social-link:hover {
+      color: var(--white);
+      border-color: rgba(255,255,255,0.2);
+      background: rgba(255,255,255,0.04);
+      transform: translateY(-1px);
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 32px 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: var(--muted);
+      font-size: 13px;
+    }
+        /* ── Scroll Reveal ── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(32px);
+      transition: opacity 0.7s cubic-bezier(0.23, 1, 0.32, 1), transform 0.7s cubic-bezier(0.23, 1, 0.32, 1);
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .reveal-delay-1 { transition-delay: 0.1s; }
+    .reveal-delay-2 { transition-delay: 0.2s; }
+    .reveal-delay-3 { transition-delay: 0.3s; }
+    .reveal-delay-4 { transition-delay: 0.4s; }
+    /* ── Responsive ── */
+    @media (max-width: 900px) {
+      nav { padding: 16px 24px; }
+      nav.scrolled { padding: 12px 24px; }
+      .nav-links { display: none; }
+      .container { padding: 0 24px; }
+      .about-inner { grid-template-columns: 1fr; gap: 48px; }
+      .achievements-grid { grid-template-columns: 1fr; }
+      .cs-grid { grid-template-columns: 1fr; }
+      .hero-stats { gap: 32px; }
+      .form-row { grid-template-columns: 1fr; }
+      footer { flex-direction: column; gap: 8px; text-align: center; }
+      .hero-orb-wrap { width: 300px; height: 300px; }
+      .hero-ring { width: 320px; height: 320px; }
+      .hero-ring-2 { width: 400px; height: 400px; }
+    }
+
+    /* Mobile menu toggle */
+    .nav-mobile-toggle {
+      display: none;
+      background: none;
+      border: none;
+      color: var(--white);
+      font-size: 24px;
+      cursor: none;
+    }
+    @media (max-width: 900px) {
+      .nav-mobile-toggle { display: block; }
+      .nav-cta { display: none; }
+    }
+  </style>
+</head>
+<body>
+  
+  <!-- Custom Cursor -->
+  <div class="cursor" id="cursor"></div>
+  <div class="cursor-ring" id="cursorRing"></div>
+
+  <!-- ── NAV ── -->
+  <nav id="navbar">
+    <div class="nav-logo">AM.</div>
+    <ul class="nav-links">
+      <li><a href="#about">About</a></li>
+      <li><a href="#achievements">Achievements</a></li>
+      <li><a href="#casestudies">Work</a></li>
+      <li><a href="#testimonials">Social Proof</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+    <button class="nav-cta" onclick="scrollTo({top:document.getElementById('contact').offsetTop,behavior:'smooth'})">
+      Let's Talk →
+    </button>
+    <button class="nav-mobile-toggle">☰</button>
+  </nav>
+  <!-- ── HERO ── -->
+  <section id="hero">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+    <div class="hero-grid"></div>
+
+    <!-- 3D Orb System -->
+    <div class="hero-orb-wrap" id="heroOrb">
+      <div class="hero-ring"></div>
+      <div class="hero-ring-2"></div>
+      <div class="hero-orb"></div>
+    </div>
+
+    <div class="hero-content">
+      <div class="hero-eyebrow">
+        <span></span>
+        Available for Strategic Partnerships
+      </div>
+      <h1 class="hero-title">
+        <div class="line"><span id="line1">Building Companies</span></div>
+        <div class="line"><span class="accent" id="line2">That Last Decades</span></div>
+        <div class="line"><span id="line3">Not Just Quarters.</span></div>
+      </h1>
+      <p class="hero-sub">
+        Serial founder, growth architect, and operator with 3 exits. I partner with ambitious founders to build category-defining companies.
+      </p>
+      <div class="hero-actions">
+        <a href="#casestudies" class="btn-primary">View My Work ↗</a>
+        <a href="#contact" class="btn-secondary">Start a Conversation</a>
+      </div>
+
+      <div class="hero-stats">
+        <div class="stat-item">
+          <div class="stat-value" data-target="3">0</div>
+          <div class="stat-label">Successful Exits</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value" data-target="240" data-suffix="M+">$0</div>
+          <div class="stat-label">Revenue Generated</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value" data-target="12">0</div>
+          <div class="stat-label">Portfolio Companies</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value" data-target="50" data-suffix="K+">0</div>
+          <div class="stat-label">Founders Mentored</div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- ── ABOUT ── -->
+  <section id="about">
+    <div class="container">
+      <div class="about-inner">
+        <div class="about-visual reveal">
+          <div class="about-photo-frame" id="photoCard">
+            <div class="about-photo-placeholder">
+              <div class="avatar-circle">AM</div>
+              <div class="about-photo-name">Alex Mercer</div>
+              <div class="about-photo-role">Founder & Builder</div>
+            </div>
+          </div>
+          <div class="about-badge">
+            <div class="badge-icon">🏆</div>
+            <div class="badge-text">
+              <strong>Forbes 30 Under 30</strong>
+              <span>Enterprise Technology, 2021</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="about-text">
+          <div class="section-eyebrow reveal">About Me</div>
+          <h2 class="section-title reveal reveal-delay-1">
+            From First-Time Founder to <span class="accent">Serial Builder</span>
+          </h2>
+          <p class="section-body reveal reveal-delay-2">
+            I started my first company at 22 with $5,000 and a laptop. Since then, I've built and sold three companies across SaaS, marketplace, and fintech verticals — learning hard lessons so you don't have to.
+          </p>
+          <p class="section-body reveal reveal-delay-3">
+            Today I invest, advise, and build alongside exceptional founders. My edge is the intersection of product intuition, growth mechanics, and capital markets. I've raised from Sequoia, Andreessen, and Benchmark — and I can help you navigate those conversations.
+          </p>
+          <div class="about-skills reveal reveal-delay-4">
+            <span class="skill-tag">Product Strategy</span>
+            <span class="skill-tag">Fundraising</span>
+            <span class="skill-tag">Go-to-Market</span>
+            <span class="skill-tag">Team Building</span>
+            <span class="skill-tag">Growth Engineering</span>
+            <span class="skill-tag">M&A</span>
+            <span class="skill-tag">SaaS Metrics</span>
+            <span class="skill-tag">Investor Relations</span>
+            <span class="skill-tag">Board Governance</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- ── ACHIEVEMENTS ── -->
+  <section id="achievements">
+    <div class="container">
+      <div class="achievements-header">
+        <div class="section-eyebrow reveal" style="display:inline-flex;">Milestones</div>
+        <h2 class="section-title reveal reveal-delay-1" style="text-align:center;">
+          Numbers That <span class="accent">Tell the Story</span>
+        </h2>
+        <p class="section-body reveal reveal-delay-2" style="text-align:center;max-width:520px;margin:0 auto;">
+          Results aren't just metrics — they're proof of systems, decisions, and teams built for compounding.
+        </p>
+      </div>
+
+      <div class="achievements-grid">
+        <div class="achievement-card reveal">
+          <div class="achievement-icon">🚀</div>
+          <div class="achievement-number">$240M</div>
+          <div class="achievement-label">Total Revenue Built</div>
+          <div class="achievement-desc">Across three companies spanning SaaS, marketplace, and fintech verticals.</div>
+          <div class="achievement-glow"></div>
+        </div>
+        <div class="achievement-card reveal reveal-delay-1">
+          <div class="achievement-icon">💰</div>
+          <div class="achievement-number">$85M</div>
+          <div class="achievement-label">Capital Raised</div>
+          <div class="achievement-desc">From tier-1 investors including Sequoia, a16z, and Benchmark across all ventures.</div>
+          <div class="achievement-glow"></div>
+        </div>
+        <div class="achievement-card reveal reveal-delay-2">
+          <div class="achievement-icon">🏢</div>
+          <div class="achievement-number">3</div>
+          <div class="achievement-label">Successful Exits</div>
+          <div class="achievement-desc">Strategic acquisitions by public companies. Average 8.4x return to early investors.</div>
+          <div class="achievement-glow"></div>
+        </div>
+        <div class="achievement-card reveal reveal-delay-1">
+          <div class="achievement-icon">👥</div>
+          <div class="achievement-number">1,200+</div>
+          <div class="achievement-label">Team Members Hired</div>
+          <div class="achievement-desc">Built and scaled high-performing engineering, product, and GTM teams globally.</div>
+          <div class="achievement-glow"></div>
+        </div>
+        <div class="achievement-card reveal reveal-delay-2">
+          <div class="achievement-icon">🌐</div>
+          <div class="achievement-number">47</div>
+          <div class="achievement-label">Countries Expanded Into</div>
+          <div class="achievement-desc">International growth playbooks deployed across EMEA, APAC, and LATAM markets.</div>
+          <div class="achievement-glow"></div>
+        </div>
+        <div class="achievement-card reveal reveal-delay-3">
+          <div class="achievement-icon">⭐</div>
+          <div class="achievement-number">12</div>
+          <div class="achievement-label">Active Portfolio Companies</div>
+          <div class="achievement-desc">Current angel investments and advisory roles in high-growth early-stage startups.</div>
+          <div class="achievement-glow"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- ── CASE STUDIES ── -->
+  <section id="casestudies">
+    <div class="container">
+      <div class="cs-header">
+        <div class="section-eyebrow reveal" style="display:inline-flex;">Case Studies</div>
+        <h2 class="section-title reveal reveal-delay-1" style="text-align:center;">
+          Work That <span class="accent">Defines Categories</span>
+        </h2>
+        <p class="section-body reveal reveal-delay-2" style="text-align:center;max-width:520px;margin:0 auto;">
+          Each company was built to solve a real problem at the right moment in the market.
+        </p>
+      </div>
+
+      <div class="cs-grid">
+        <div class="cs-card reveal">
+          <div class="cs-arrow">↗</div>
+          <div class="cs-card-thumb cs-thumb-bg-1">⚡</div>
+          <div class="cs-card-body">
+            <div class="cs-tag">SaaS · B2B</div>
+            <div class="cs-title">VelocityHQ — Revenue Intelligence Platform</div>
+            <div class="cs-desc">Built from zero to Series C in 36 months. Pioneered AI-driven revenue forecasting for enterprise sales teams before it was a category. Acquired by Salesforce.</div>
+            <div class="cs-metrics">
+              <div>
+                <div class="cs-metric-val">$72M</div>
+                <div class="cs-metric-key">ARR at exit</div>
+              </div>
+              <div>
+                <div class="cs-metric-val">340%</div>
+                <div class="cs-metric-key">YoY growth</div>
+              </div>
+              <div>
+                <div class="cs-metric-val">8.4×</div>
+                <div class="cs-metric-key">Return multiple</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="cs-card reveal reveal-delay-1">
+          <div class="cs-arrow">↗</div>
+          <div class="cs-card-thumb cs-thumb-bg-2">🌊</div>
+          <div class="cs-card-body">
+            <div class="cs-tag">Marketplace · Fintech</div>
+            <div class="cs-title">Flowstate — B2B Payments Marketplace</div>
+            <div class="cs-desc">Reimagined how businesses pay each other. Built the first embedded payment rails for mid-market supply chains, processing $2B in GMV before strategic exit.</div>
+            <div class="cs-metrics">
+              <div>
+                <div class="cs-metric-val">$2B</div>
+                <div class="cs-metric-key">GMV processed</div>
+              </div>
+              <div>
+                <div class="cs-metric-val">4,000+</div>
+                <div class="cs-metric-key">Business users</div>
+              </div>
+              <div>
+                <div class="cs-metric-val">18mo</div>
+                <div class="cs-metric-key">To profitability</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="cs-card reveal reveal-delay-2">
+          <div class="cs-arrow">↗</div>
+          <div class="cs-card-thumb cs-thumb-bg-3">🔮</div>
+          <div class="cs-card-body">
+            <div class="cs-tag">Developer Tools · AI</div>
+            <div class="cs-title">Prism — AI Workflow Automation</div>
+            <div class="cs-desc">No-code AI workflow builder that democratized automation for non-technical operators. 0 to 50K users in 14 months on pure product-led growth. Currently in portfolio.</div>
+            <div class="cs-metrics">
+              <div>
+                <div class="cs-metric-val">50K</div>
+                <div class="cs-metric-key">Active users</div>
+              </div>
+              <div>
+                <div class="cs-metric-val">$0</div>
+                <div class="cs-metric-key">Paid acquisition</div>
+              </div>
+              <div>
+                <div class="cs-metric-val">94%</div>
+                <div class="cs-metric-key">Retention</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="cs-card reveal reveal-delay-3">
+          <div class="cs-arrow">↗</div>
+          <div class="cs-card-thumb cs-thumb-bg-4">🌱</div>
+          <div class="cs-card-body">
+            <div class="cs-tag">Climate Tech · Hardware</div>
+            <div class="cs-title">TerraCycle — Carbon Offset Infrastructure</div>
+            <div class="cs-desc">Built the physical and financial infrastructure for enterprise carbon credit markets. Helped 200 Fortune 500 companies meet net-zero commitments with verifiable offsets.</div>
+            <div class="cs-metrics">
+              <div>
+                <div class="cs-metric-val">200</div>
+                <div class="cs-metric-key">Enterprise clients</div>
+              </div>
+              <div>
+                <div class="cs-metric-val">12MT</div>
+                <div class="cs-metric-key">CO₂ offset</div>
+              </div>
+              <div>
+                <div class="cs-metric-val">$40M</div>
+                <div class="cs-metric-key">Series B raised</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+      <!-- ── TESTIMONIALS ── -->
+  <section id="testimonials">
+    <div class="container" style="margin-bottom:60px;">
+      <div class="testimonials-header">
+        <div class="section-eyebrow reveal" style="display:inline-flex;">Testimonials</div>
+        <h2 class="section-title reveal reveal-delay-1" style="text-align:center;">
+          What Founders <span class="accent">Actually Say</span>
+        </h2>
+      </div>
+    </div>
+
+    <!-- Row 1 -->
+    <div class="marquee-wrap">
+      <div class="marquee-track" id="marquee1">
+        <!-- Cards duplicated for infinite scroll -->
+        <div class="t-card">
+          <div class="t-stars">★★★★★</div>
+          <div class="t-quote">"</div>
+          <div class="t-text">Alex's GTM framework was the single most impactful thing we did in Year 2. We went from $1M to $18M ARR in 12 months with his playbook.</div>
+          <div class="t-author">
+            <div class="t-avatar" style="background:linear-gradient(135deg,#6366F1,#22D3EE)">SR</div>
+            <div>
+              <div class="t-author-name">Sarah Rahman</div>
+              <div class="t-author-title">CEO, DataLayer (Series B)</div>
+            </div>
+          </div>
+        </div>
+        <div class="t-card">
+          <div class="t-stars">★★★★★</div>
+          <div class="t-quote">"</div>
+          <div class="t-text">I've worked with many advisors. Alex is the only one who actually gets in the trenches. He helped us renegotiate our entire cap table before our Series A.</div>
+          <div class="t-author">
+            <div class="t-avatar" style="background:linear-gradient(135deg,#EC4899,#8B5CF6)">MK</div>
+            <div>
+              <div class="t-author-name">Marcus Kim</div>
+              <div class="t-author-title">Founder, Stackwise</div>
+            </div>
+          </div>
+        </div>
+        <div class="t-card">
+          <div class="t-stars">★★★★★</div>
+          <div class="t-quote">"</div>
+          <div class="t-text">Alex introduced us to the partner who led our seed round. But more importantly, he prepared us so thoroughly that we closed in 3 weeks flat.</div>
+          <div class="t-author">
+            <div class="t-avatar" style="background:linear-gradient(135deg,#F59E0B,#EF4444)">JP</div>
+            <div>
+              <div class="t-author-name">Julia Park</div>
+              <div class="t-author-title">Co-founder, Luminary AI</div>
+            </div>
+          </div>
+        </div>
+        <div class="t-card">
+          <div class="t-stars">★★★★★</div>
+          <div class="t-quote">"</div>
+          <div class="t-text">He told us to fire our first VP of Sales after 60 days. We didn't listen. Six months later we did anyway. Should have listened to Alex on day one.</div>
+          <div class="t-author">
+            <div class="t-avatar" style="background:linear-gradient(135deg,#10B981,#3B82F6)">DL</div>
+            <div>
+              <div class="t-author-name">David Lim</div>
+              <div class="t-author-title">CEO, Orbit Commerce</div>
+            </div>
+          </div>
+        </div>
+        <div class="t-card">
+          <div class="t-stars">★★★★★</div>
+          <div class="t-quote">"</div>
+          <div class="t-text">Alex's network alone is worth his advisory equity. Within 48 hours of onboarding him, I had intro calls with 6 potential enterprise clients.</div>
+          <div class="t-author">
+            <div class="t-avatar" style="background:linear-gradient(135deg,#8B5CF6,#EC4899)">AT</div>
+            <div>
+              <div class="t-author-name">Ana Torres</div>
+              <div class="t-author-title">Founder, Meridian Health</div>
+            </div>
+          </div>
+        </div>
+        <!-- Duplicates for seamless loop -->
+        <div class="t-card">
+          <div class="t-stars">★★★★★</div>
+          <div class="t-quote">"</div>
+          <div class="t-text">Alex's GTM framework was the single most impactful thing we did in Year 2. We went from $1M to $18M ARR in 12 months with his playbook.</div>
+          <div class="t-author">
+            <div class="t-avatar" style="background:linear-gradient(135deg,#6366F1,#22D3EE)">SR</div>
+            <div>
+              <div class="t-author-name">Sarah Rahman</div>
+              <div class="t-author-title">CEO, DataLayer (Series B)</div>
+            </div>
+          </div>
+        </div>
+        <div class="t-card">
+          <div class="t-stars">★★★★★</div>
+          <div class="t-quote">"</div>
+          <div class="t-text">I've worked with many advisors. Alex is the only one who actually gets in the trenches. He helped us renegotiate our entire cap table before our Series A.</div>
+          <div class="t-author">
+            <div class="t-avatar" style="background:linear-gradient(135deg,#EC4899,#8B5CF6)">MK</div>
+            <div>
+              <div class="t-author-name">Marcus Kim</div>
+              <div class="t-author-title">Founder, Stackwise</div>
+            </div>
+          </div>
+        </div>
+        <div class="t-card">
+          <div class="t-stars">★★★★★</div>
+          <div class="t-quote">"</div>
+          <div class="t-text">Alex introduced us to the partner who led our seed round. But more importantly, he prepared us so thoroughly that we closed in 3 weeks flat.</div>
+          <div class="t-author">
+            <div class="t-avatar" style="background:linear-gradient(135deg,#F59E0B,#EF4444)">JP</div>
+            <div>
+              <div class="t-author-name">Julia Park</div>
+              <div class="t-author-title">Co-founder, Luminary AI</div>
+            </div>
+          </div>
+        </div>
+        <div class="t-card">
+          <div class="t-stars">★★★★★</div>
+          <div class="t-quote">"</div>
+          <div class="t-text">He told us to fire our first VP of Sales after 60 days. We didn't listen. Six months later we did anyway. Should have listened to Alex on day one.</div>
+          <div class="t-author">
+            <div class="t-avatar" style="background:linear-gradient(135deg,#10B981,#3B82F6)">DL</div>
+            <div>
+              <div class="t-author-name">David Lim</div>
+              <div class="t-author-title">CEO, Orbit Commerce</div>
+            </div>
+          </div>
+        </div>
+        <div class="t-card">
+          <div class="t-stars">★★★★★</div>
+          <div class="t-quote">"</div>
+          <div class="t-text">Alex's network alone is worth his advisory equity. Within 48 hours of onboarding him, I had intro calls with 6 potential enterprise clients.</div>
+          <div class="t-author">
+            <div class="t-avatar" style="background:linear-gradient(135deg,#8B5CF6,#EC4899)">AT</div>
+            <div>
+              <div class="t-author-name">Ana Torres</div>
+              <div class="t-author-title">Founder, Meridian Health</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+        <!-- Row 2 -->
+    <div class="marquee-wrap" style="margin-top:24px;">
+      <div class="marquee-track marquee-track-reverse">
+        <div class="t-card">
+          <div class="t-stars">★★★★★</div>
+          <div class="t-quote">"</div>
+          <div class="t-text">In two years of working with Alex, our NPS went from 28 to 71. He completely rewired how we thought about customer success as a growth lever.</div>
+          <div class="t-author">
+            <div class="t-avatar" style="background:linear-gradient(135deg,#14B8A6,#6366F1)">BN</div>
+            <div>
+              <div class="t-author-name">Ben Nakamura</div>
+              <div class="t-author-title">CPO, Convex Systems</div>
+            </div>
+          </div>
+        </div>
+        <div class="t-card">
+          <div class="t-stars">★★★★★</div>
+          <div class="t-quote">"</div>
+          <div class="t-text">Alex has a rare ability to zoom out to strategy and zoom in to execution in the same conversation. That versatility is what separates him from other advisors.</div>
+          <div class="t-author">
+            <div class="t-avatar" style="background:linear-gradient(135deg,#F97316,#FBBF24)">LC</div>
+            <div>
+              <div class="t-author-name">Lisa Chen</div>
+              <div class="t-author-title">CEO, Novawave</div>
+            </div>
+          </div>
+        </div>
+        <div class="t-card">
+          <div class="t-stars">★★★★★</div>
+          <div class="t-quote">"</div>
+          <div class="t-text">We pivoted our entire business model based on one conversation with Alex. Best pivot we ever made. We tripled revenue the next quarter.</div>
+          <div class="t-author">
+            <div class="t-avatar" style="background:linear-gradient(135deg,#3B82F6,#10B981)">RP</div>
+            <div>
+              <div class="t-author-name">Ryan Patel</div>
+              <div class="t-author-title">Founder, Archetype Labs</div>
+            </div>
+          </div>
+        </div>
+        <div class="t-card">
+          <div class="t-stars">★★★★★</div>
+          <div class="t-quote">"</div>
+          <div class="t-text">Getting Alex as a co-founder mentor was the best thing I did in my first year. His checklist for hiring your first 10 engineers alone saved us from 4 bad hires.</div>
+          <div class="t-author">
+            <div class="t-avatar" style="background:linear-gradient(135deg,#EF4444,#F59E0B)">ZK</div>
+            <div>
+              <div class="t-author-name">Zoe Kumar</div>
+              <div class="t-author-title">CTO, Pinnacle AI</div>
+            </div>
+          </div>
+        </div>
+        <div class="t-card">
+          <div class="t-stars">★★★★★</div>
+          <div class="t-quote">"</div>
+          <div class="t-text">Alex's due diligence prep got us a term sheet in 9 days from first meeting. Sequoia partner literally told us it was the best-prepared deck they'd seen that year.</div>
+          <div class="t-author">
+            <div class="t-avatar" style="background:linear-gradient(135deg,#7C3AED,#22D3EE)">NM</div>
+            <div>
+              <div class="t-author-name">Nia Morrison</div>
+              <div class="t-author-title">Founder, Bridge Protocol</div>
+            </div>
+          </div>
+        </div>
+    <!-- Duplicates -->
+        <div class="t-card">
+          <div class="t-stars">★★★★★</div>
+          <div class="t-quote">"</div>
+          <div class="t-text">In two years of working with Alex, our NPS went from 28 to 71. He completely rewired how we thought about customer success as a growth lever.</div>
+          <div class="t-author">
+            <div class="t-avatar" style="background:linear-gradient(135deg,#14B8A6,#6366F1)">BN</div>
+            <div>
+              <div class="t-author-name">Ben Nakamura</div>
+              <div class="t-author-title">CPO, Convex Systems</div>
+            </div>
+          </div>
+        </div>
+        <div class="t-card">
+          <div class="t-stars">★★★★★</div>
+          <div class="t-quote">"</div>
+          <div class="t-text">Alex has a rare ability to zoom out to strategy and zoom in to execution in the same conversation. That versatility is what separates him from other advisors.</div>
+          <div class="t-author">
+            <div class="t-avatar" style="background:linear-gradient(135deg,#F97316,#FBBF24)">LC</div>
+            <div>
+              <div class="t-author-name">Lisa Chen</div>
+              <div class="t-author-title">CEO, Novawave</div>
+            </div>
+          </div>
+        </div>
+        <div class="t-card">
+          <div class="t-stars">★★★★★</div>
+          <div class="t-quote">"</div>
+          <div class="t-text">We pivoted our entire business model based on one conversation with Alex. Best pivot we ever made. We tripled revenue the next quarter.</div>
+          <div class="t-author">
+            <div class="t-avatar" style="background:linear-gradient(135deg,#3B82F6,#10B981)">RP</div>
+            <div>
+              <div class="t-author-name">Ryan Patel</div>
+              <div class="t-author-title">Founder, Archetype Labs</div>
+            </div>
+          </div>
+        </div>
+        <div class="t-card">
+          <div class="t-stars">★★★★★</div>
+          <div class="t-quote">"</div>
+          <div class="t-text">Getting Alex as a co-founder mentor was the best thing I did in my first year. His checklist for hiring your first 10 engineers alone saved us from 4 bad hires.</div>
+          <div class="t-author">
+            <div class="t-avatar" style="background:linear-gradient(135deg,#EF4444,#F59E0B)">ZK</div>
+            <div>
+              <div class="t-author-name">Zoe Kumar</div>
+              <div class="t-author-title">CTO, Pinnacle AI</div>
+            </div>
+          </div>
+        </div>
+        <div class="t-card">
+          <div class="t-stars">★★★★★</div>
+          <div class="t-quote">"</div>
+          <div class="t-text">Alex's due diligence prep got us a term sheet in 9 days from first meeting. Sequoia partner literally told us it was the best-prepared deck they'd seen that year.</div>
+          <div class="t-author">
+            <div class="t-avatar" style="background:linear-gradient(135deg,#7C3AED,#22D3EE)">NM</div>
+            <div>
+              <div class="t-author-name">Nia Morrison</div>
+              <div class="t-author-title">Founder, Bridge Protocol</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+    <!-- ── CONTACT ── -->
+  <section id="contact">
+    <div class="container">
+      <div class="contact-inner">
+        <div class="section-eyebrow reveal" style="display:inline-flex;margin-bottom:20px;">Let's Build</div>
+        <h2 class="contact-title reveal reveal-delay-1">
+          Ready to Build Something <span class="accent">Meaningful?</span>
+        </h2>
+        <p class="contact-sub reveal reveal-delay-2">
+          Whether you're pre-product or post-revenue, I work with founders who have conviction and are playing the long game. Tell me about what you're building.
+        </p>
+
+        <div class="contact-form reveal reveal-delay-3">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">First Name</label>
+              <input type="text" class="form-input" placeholder="Alex" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Last Name</label>
+              <input type="text" class="form-input" placeholder="Chen" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Email</label>
+            <input type="email" class="form-input" placeholder="alex@yourstartup.com" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Company</label>
+            <input type="text" class="form-input" placeholder="Your company name" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Stage</label>
+            <select class="form-select form-input">
+              <option value="" disabled selected>Select your current stage</option>
+              <option>Idea / Pre-Product</option>
+              <option>Pre-Revenue / MVP</option>
+              <option>Seed ($0–$1M ARR)</option>
+              <option>Series A ($1M–$10M ARR)</option>
+              <option>Series B+ ($10M+ ARR)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">What are you building?</label>
+            <textarea class="form-textarea" placeholder="Tell me about your company, the problem you're solving, and what kind of partnership you're looking for..."></textarea>
+          </div>
+          <button class="form-submit" onclick="handleSubmit(event)">
+            <span id="submitText">Send Message →</span>
+          </button>
+        </div>
+
+        <div class="contact-socials reveal reveal-delay-4">
+          <a href="#" class="social-link">𝕏 Twitter</a>
+          <a href="#" class="social-link">in LinkedIn</a>
+          <a href="#" class="social-link">📧 Email</a>
+          <a href="#" class="social-link">🎙️ Podcast</a>
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- ── FOOTER ── -->
+  <footer>
+    <div>© 2026 Alex Mercer. All rights reserved.</div>
+    <div style="display:flex;gap:24px;">
+      <a href="#" style="color:var(--muted);text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='var(--muted)'">Privacy</a>
+      <a href="#" style="color:var(--muted);text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='var(--muted)'">Terms</a>
+    </div>
+  </footer>
+
+  <script>
+    // ── Custom Cursor ──
+    const cursor = document.getElementById('cursor');
+    const cursorRing = document.getElementById('cursorRing');
+    let mouseX = 0, mouseY = 0, ringX = 0, ringY = 0;
+
+    document.addEventListener('mousemove', e => {
+      mouseX = e.clientX; mouseY = e.clientY;
+      cursor.style.left = mouseX + 'px';
+      cursor.style.top = mouseY + 'px';
+    });
+
+    function animateRing() {
+      ringX += (mouseX - ringX) * 0.12;
+      ringY += (mouseY - ringY) * 0.12;
+      cursorRing.style.left = ringX + 'px';
+      cursorRing.style.top = ringY + 'px';
+      requestAnimationFrame(animateRing);
+    }
+    animateRing();
+
+    document.querySelectorAll('a, button, .cs-card, .achievement-card, .t-card, .skill-tag').forEach(el => {
+      el.addEventListener('mouseenter', () => {
+        cursor.style.width = '20px';
+        cursor.style.height = '20px';
+        cursorRing.style.width = '60px';
+        cursorRing.style.height = '60px';
+        cursorRing.style.borderColor = 'rgba(99,102,241,0.8)';
+      });
+      el.addEventListener('mouseleave', () => {
+        cursor.style.width = '12px';
+        cursor.style.height = '12px';
+        cursorRing.style.width = '40px';
+        cursorRing.style.height = '40px';
+        cursorRing.style.borderColor = 'rgba(99,102,241,0.5)';
+      });
+    });
+
+    // ── Navbar scroll ──
+    const navbar = document.getElementById('navbar');
+    window.addEventListener('scroll', () => {
+      navbar.classList.toggle('scrolled', window.scrollY > 40);
+    });
+
+    // ── 3D Orb mouse parallax ──
+    const heroOrb = document.getElementById('heroOrb');
+    document.getElementById('hero').addEventListener('mousemove', e => {
+      const rect = e.currentTarget.getBoundingClientRect();
+      const cx = rect.left + rect.width / 2;
+      const cy = rect.top + rect.height / 2;
+      const dx = (e.clientX - cx) / rect.width;
+      const dy = (e.clientY - cy) / rect.height;
+      heroOrb.style.transform = `translate(calc(-50% + ${dx * 30}px), calc(-50% + ${dy * 20}px))`;
+    });
+    
+    // ── Photo card 3D tilt ──
+    const photoCard = document.getElementById('photoCard');
+    if (photoCard) {
+      photoCard.addEventListener('mousemove', e => {
+        const rect = photoCard.getBoundingClientRect();
+        const x = (e.clientX - rect.left) / rect.width - 0.5;
+        const y = (e.clientY - rect.top) / rect.height - 0.5;
+        photoCard.style.transform = `perspective(800px) rotateY(${x * 12}deg) rotateX(${-y * 10}deg) scale(1.02)`;
+      });
+      photoCard.addEventListener('mouseleave', () => {
+        photoCard.style.transform = 'perspective(800px) rotateY(0deg) rotateX(0deg) scale(1)';
+        photoCard.style.transition = 'transform 0.5s ease';
+      });
+      photoCard.addEventListener('mouseenter', () => {
+        photoCard.style.transition = 'none';
+      });
+    }
+
+    // ── Achievement cards 3D tilt ──
+    document.querySelectorAll('.achievement-card').forEach(card => {
+      card.addEventListener('mousemove', e => {
+        const rect = card.getBoundingClientRect();
+        const x = (e.clientX - rect.left) / rect.width - 0.5;
+        const y = (e.clientY - rect.top) / rect.height - 0.5;
+        card.style.transform = `translateY(-6px) rotateY(${x * 8}deg) rotateX(${-y * 6}deg)`;
+      });
+      card.addEventListener('mouseleave', () => {
+        card.style.transform = '';
+      });
+    });
+    // ── Counter animation ──
+    function animateCounter(el) {
+      const target = parseInt(el.dataset.target);
+      const suffix = el.dataset.suffix || '';
+      const prefix = el.dataset.prefix || '';
+      const duration = 2000;
+      const start = performance.now();
+      const isRevenue = el.textContent.includes('$');
+      function update(now) {
+        const elapsed = now - start;
+        const progress = Math.min(elapsed / duration, 1);
+        const eased = 1 - Math.pow(1 - progress, 3);
+        const current = Math.floor(eased * target);
+        el.textContent = (isRevenue ? '$' : '') + current + suffix;
+        if (progress < 1) requestAnimationFrame(update);
+        else el.textContent = (isRevenue ? '$' : '') + target + suffix;
+      }
+      requestAnimationFrame(update);
+    }
+
+    // ── Scroll reveal ──
+    const reveals = document.querySelectorAll('.reveal');
+    const statValues = document.querySelectorAll('[data-target]');
+    let countersTriggered = false;
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, { threshold: 0.15 });
+
+    reveals.forEach(el => observer.observe(el));
+
+    const heroObserver = new IntersectionObserver(entries => {
+      if (entries[0].isIntersecting && !countersTriggered) {
+        countersTriggered = true;
+        setTimeout(() => {
+          statValues.forEach(animateCounter);
+        }, 600);
+      }
+    }, { threshold: 0.3 });
+    heroObserver.observe(document.getElementById('hero'));
+
+    // ── Hero text entrance ──
+    window.addEventListener('load', () => {
+      const lines = document.querySelectorAll('.hero-title .line span');
+      lines.forEach((line, i) => {
+        line.style.opacity = '0';
+        line.style.transform = 'translateY(40px)';
+        line.style.display = 'block';
+        line.style.transition = `opacity 0.8s cubic-bezier(0.23,1,0.32,1) ${i * 0.15 + 0.3}s, transform 0.8s cubic-bezier(0.23,1,0.32,1) ${i * 0.15 + 0.3}s`;
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            line.style.opacity = '1';
+            line.style.transform = 'translateY(0)';
+          });
+        });
+      });
+
+      // Also animate stat values on load since hero is visible
+      setTimeout(() => {
+        if (!countersTriggered) {
+          countersTriggered = true;
+          statValues.forEach(animateCounter);
+        }
+      }, 1200);
+    });
+
+    // ── Form submit ──
+    function handleSubmit(e) {
+      const btn = e.currentTarget;
+      const text = document.getElementById('submitText');
+      text.textContent = 'Sending...';
+      btn.style.opacity = '0.7';
+      setTimeout(() => {
+        text.textContent = '✓ Message Sent!';
+        btn.style.background = '#10B981';
+        btn.style.opacity = '1';
+        setTimeout(() => {
+          text.textContent = 'Send Message →';
+          btn.style.background = '';
+        }, 3000);
+      }, 1500);
+    }
+  </script>
+</body>
+</html>
